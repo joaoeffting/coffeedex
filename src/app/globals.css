@@ -1,26 +1,122 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-fredoka);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Cozy Pokédex-style palette: cream/parchment background, near-black chunky
+   outlines on cards (the "-dex" collection-album look from the reference
+   moodboard), a lime-green primary for CTAs, and a terracotta accent
+   standing in for the reference's coral pokeball-red — warmer, more
+   coffee-appropriate than a pure red. */
+:root {
+  --radius: 1.25rem;
+  --background: #f7efde;
+  --foreground: #2b1d12;
+  --primary: #c7dd5a;
+  --primary-foreground: #1e2a0c;
+  --secondary: #e8dcbe;
+  --secondary-foreground: #2b1d12;
+  --accent: #e2694b;
+  --accent-foreground: #fff7ec;
+  --muted: #efe6d0;
+  --muted-foreground: #7a6650;
+  --destructive: #b23a26;
+  --destructive-foreground: #fff7ec;
+  --border: #2b1d12;
+  --input: #ddccA6;
+  --ring: #c7dd5a;
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --card: #fffbf2;
+  --card-foreground: var(--foreground);
+}
+
+.dark {
+  --background: #1c140d;
+  --foreground: #f3e9d8;
+  --primary: #c7dd5a;
+  --primary-foreground: #1e2a0c;
+  --secondary: #3a2c1e;
+  --secondary-foreground: #f3e9d8;
+  --accent: #e2694b;
+  --accent-foreground: #1c140d;
+  --muted: #2e2216;
+  --muted-foreground: #c2af95;
+  --destructive: #d9503a;
+  --destructive-foreground: #1c140d;
+  --border: #4a3a28;
+  --input: #4a3a28;
+  --ring: #c7dd5a;
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --card: #241b12;
+  --card-foreground: var(--foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading;
+  }
+  /* iOS Safari auto-zooms on any input under 16px — Tailwind's own base
+     text size is 16px, so this isn't a visual downgrade, just a guard
+     against a future text-sm-scoped form tripping it. */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Chunky black-outline "dex card" look shared by the collection grid and
+   shop-detail panels — centralized here instead of repeating the same
+   border/shadow combo on every card usage. */
+.dex-outline {
+  border-width: 3px;
+  border-color: var(--border);
+  box-shadow: 4px 4px 0 0 var(--border);
 }
