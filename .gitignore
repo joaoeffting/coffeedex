@@ -42,3 +42,6 @@ next-env.d.ts
 
 # editor workspace files — machine-specific, not project code
 *.code-workspace
+
+# Supabase CLI local state
+supabase/.temp

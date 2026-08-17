@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { MapShop } from "@/components/stockholm-map";
 
 // Leaflet touches `window` during map initialization — ssr: false keeps it
 // out of the server render entirely rather than fighting a hydration
@@ -18,4 +19,23 @@ const StockholmMap = dynamic(
   },
 );
 
-export { StockholmMap as StockholmMapLoader };
+export function StockholmMapLoader({
+  shops,
+  center,
+  zoom,
+  linkToDetail,
+}: {
+  shops: MapShop[];
+  center?: [number, number];
+  zoom?: number;
+  linkToDetail?: boolean;
+}) {
+  return (
+    <StockholmMap
+      shops={shops}
+      center={center}
+      zoom={zoom}
+      linkToDetail={linkToDetail}
+    />
+  );
+}
