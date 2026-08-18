@@ -27,7 +27,7 @@ const fredoka = Fredoka({
   weight: ["500", "600", "700"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

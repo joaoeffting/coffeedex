@@ -5,6 +5,8 @@ import { Star, MapPin, ExternalLink } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import { StockholmMapLoader } from "@/components/stockholm-map-loader";
 import { Badge } from "@/components/ui/badge";
+import { ReviewForm } from "@/components/review-form";
+import { ReviewList } from "@/components/review-list";
 
 export async function generateMetadata({
   params,
@@ -29,10 +31,13 @@ export async function generateMetadata({
 
 export default async function ShopDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ dexNumber: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { dexNumber } = await params;
+  const { review_error: reviewError } = await searchParams;
   const dexNum = Number(dexNumber);
   if (!Number.isInteger(dexNum)) notFound();
 
@@ -45,7 +50,28 @@ export default async function ShopDetailPage({
 
   if (!shop) notFound();
 
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`;
+  const [{ data: reviews }, { data: claims }] = await Promise.all([
+    supabase
+      .from("shop_reviews")
+      .select("id, user_id, rating, comment, created_at")
+      .eq("shop_id", shop.id)
+      .order("created_at", { ascending: false }),
+    supabase.auth.getClaims(),
+  ]);
+
+  const allReviews = reviews ?? [];
+  const currentUserId = (claims?.claims.sub as string | undefined) ?? null;
+  const myReview = allReviews.find((r) => r.user_id === currentUserId) ?? null;
+  const otherReviews = allReviews.filter((r) => r.id !== myReview?.id);
+  const liveRating =
+    allReviews.length > 0
+      ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
+      : null;
+
+  // Name + address (not lat/lng) — per Google's Maps URL docs, this is what
+  // resolves to the actual business listing page (photos, reviews, hours)
+  // instead of just centering the map on a coordinate.
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${shop.name}, ${shop.address}`)}`;
   const appleMapsUrl = `https://maps.apple.com/?ll=${shop.lat},${shop.lng}&q=${encodeURIComponent(shop.name)}`;
 
   return (
@@ -68,17 +94,32 @@ export default async function ShopDetailPage({
         </p>
       </div>
 
-      {shop.rating != null && (
+      {liveRating != null ? (
         <div className="flex items-center gap-1.5">
           <Star
             className="h-5 w-5 fill-primary text-primary"
             aria-hidden="true"
           />
-          <span className="font-medium">{shop.rating.toFixed(1)}</span>
+          <span className="font-medium">{liveRating.toFixed(1)}</span>
           <span className="text-sm text-muted-foreground">
-            — aggregate rating at time of curation, not live
+            from {allReviews.length} coffeedex review
+            {allReviews.length === 1 ? "" : "s"}
           </span>
         </div>
+      ) : (
+        shop.rating != null && (
+          <div className="flex items-center gap-1.5">
+            <Star
+              className="h-5 w-5 fill-primary text-primary"
+              aria-hidden="true"
+            />
+            <span className="font-medium">{shop.rating.toFixed(1)}</span>
+            <span className="text-sm text-muted-foreground">
+              — aggregate rating at time of curation, not live. Be the first
+              to leave a coffeedex review below.
+            </span>
+          </div>
+        )
       )}
 
       {shop.tags.length > 0 && (
@@ -121,6 +162,24 @@ export default async function ShopDetailPage({
           Open in Apple Maps
           <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
         </a>
+      </div>
+
+      <div className="space-y-4 border-t border-border pt-6">
+        <h2 className="font-heading text-xl font-semibold">Reviews</h2>
+        <ReviewForm
+          shopId={shop.id}
+          dexNumber={shop.dex_number}
+          signedIn={currentUserId != null}
+          existing={myReview}
+          error={
+            typeof reviewError === "string" ? reviewError : undefined
+          }
+        />
+        <ReviewList
+          reviews={myReview ? [myReview, ...otherReviews] : otherReviews}
+          currentUserId={currentUserId}
+          dexNumber={shop.dex_number}
+        />
       </div>
     </main>
   );
