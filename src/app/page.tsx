@@ -32,7 +32,7 @@ export default function Home() {
         <Button
           size="lg"
           className="dex-outline w-full"
-          render={<Link href="/discover">Get started!</Link>}
+          render={<Link href="/dex">Get started!</Link>}
         />
         <Button
           variant="outline"

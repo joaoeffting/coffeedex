@@ -100,6 +100,35 @@ export type Database = {
           },
         ]
       }
+      visited_shops: {
+        Row: {
+          id: string
+          shop_id: string
+          user_id: string
+          visited_at: string
+        }
+        Insert: {
+          id?: string
+          shop_id: string
+          user_id?: string
+          visited_at?: string
+        }
+        Update: {
+          id?: string
+          shop_id?: string
+          user_id?: string
+          visited_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visited_shops_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "coffee_shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

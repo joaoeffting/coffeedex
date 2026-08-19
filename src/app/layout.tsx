@@ -66,10 +66,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </Link>
               <nav className="flex items-center gap-4">
                 <Link
-                  href="/discover"
+                  href="/dex"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
-                  Discover
+                  Dex
                 </Link>
                 <Suspense fallback={null}>
                   <NavAuthLinks />

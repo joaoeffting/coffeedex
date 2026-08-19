@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { StockholmMapLoader } from "@/components/stockholm-map-loader";
+import { DexMapToggle } from "@/components/dex-map-toggle";
 
 export const metadata: Metadata = {
   title: "Discover",
@@ -16,12 +17,15 @@ export default async function DiscoverPage() {
 
   return (
     <main className="mx-auto flex h-[calc(100vh-8rem)] max-w-4xl flex-col gap-4 px-4 py-6">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold">Discover</h1>
-        <p className="text-sm text-muted-foreground">
-          {shops?.length ?? 0} Stockholm coffee shops — tap a pin to see
-          which.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-2xl font-semibold">Discover</h1>
+          <p className="text-sm text-muted-foreground">
+            {shops?.length ?? 0} Stockholm coffee shops — tap a pin to see
+            which.
+          </p>
+        </div>
+        <DexMapToggle active="map" />
       </div>
       <div className="min-h-0 flex-1">
         <StockholmMapLoader shops={shops ?? []} />
