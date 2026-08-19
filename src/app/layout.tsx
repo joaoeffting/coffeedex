@@ -32,15 +32,15 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Coffeedex — Collect Stockholm's Coffee Shops",
+    default: "Coffeedex — Collect a City's Coffee Shops",
     template: "%s · Coffeedex",
   },
   description:
-    "A Pokédex-style collection game for Stockholm's coffee shops: visit a real cafe, mark it visited, and watch your personal album fill in.",
+    "A Pokédex-style collection game for real coffee shops: visit a cafe, mark it visited, and watch your personal album fill in — one city at a time.",
   openGraph: {
-    title: "Coffeedex — Collect Stockholm's Coffee Shops",
+    title: "Coffeedex — Collect a City's Coffee Shops",
     description:
-      "A Pokédex-style collection game for Stockholm's coffee shops: visit a real cafe, mark it visited, and watch your personal album fill in.",
+      "A Pokédex-style collection game for real coffee shops: visit a cafe, mark it visited, and watch your personal album fill in — one city at a time.",
     url: siteUrl,
     siteName: "Coffeedex",
     locale: "en_US",
@@ -71,6 +71,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   Dex
                 </Link>
+                <Link
+                  href="/change-city"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Change City
+                </Link>
                 <Suspense fallback={null}>
                   <NavAuthLinks />
                 </Suspense>
@@ -80,7 +86,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="flex-1">{children}</div>
           <footer className="border-t-2 border-border bg-secondary/40 px-4 py-6 text-center text-xs text-muted-foreground">
             <p>
-              Coffeedex — a Stockholm coffee shop collection.{" "}
+              Coffeedex — a coffee shop collection.{" "}
               <Link href="/privacy" className="underline underline-offset-4">
                 Privacy Policy
               </Link>{" "}

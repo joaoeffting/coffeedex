@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/server";
 // trust for ownership.
 export async function upsertReview(
   shopId: string,
+  citySlug: string,
   dexNumber: number,
   formData: FormData,
 ) {
@@ -23,7 +24,7 @@ export async function upsertReview(
 
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     redirect(
-      `/shops/${dexNumber}?review_error=${encodeURIComponent("Pick a star rating before submitting.")}`,
+      `/shops/${citySlug}/${dexNumber}?review_error=${encodeURIComponent("Pick a star rating before submitting.")}`,
     );
   }
 
@@ -39,14 +40,18 @@ export async function upsertReview(
 
   if (error) {
     redirect(
-      `/shops/${dexNumber}?review_error=${encodeURIComponent(error.message)}`,
+      `/shops/${citySlug}/${dexNumber}?review_error=${encodeURIComponent(error.message)}`,
     );
   }
 
-  revalidatePath(`/shops/${dexNumber}`);
+  revalidatePath(`/shops/${citySlug}/${dexNumber}`);
 }
 
-export async function deleteReview(reviewId: string, dexNumber: number) {
+export async function deleteReview(
+  reviewId: string,
+  citySlug: string,
+  dexNumber: number,
+) {
   const supabase = await createClient();
   const { data, error: authError } = await supabase.auth.getClaims();
   if (authError || !data?.claims) redirect("/login");
@@ -55,5 +60,5 @@ export async function deleteReview(reviewId: string, dexNumber: number) {
   // scopes this to rows the caller owns.
   await supabase.from("shop_reviews").delete().eq("id", reviewId);
 
-  revalidatePath(`/shops/${dexNumber}`);
+  revalidatePath(`/shops/${citySlug}/${dexNumber}`);
 }

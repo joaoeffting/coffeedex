@@ -19,7 +19,7 @@ export async function markVisited(
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/dex");
+  revalidatePath("/dex/[city]", "page");
   return { ok: true };
 }
 
@@ -39,6 +39,6 @@ export async function unmarkVisited(
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/dex");
+  revalidatePath("/dex/[city]", "page");
   return { ok: true };
 }

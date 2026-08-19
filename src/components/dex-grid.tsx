@@ -19,10 +19,12 @@ type Filter = "all" | "visited" | "not-visited";
 
 export function DexGrid({
   shops,
+  citySlug,
   initiallyVisited,
   signedIn,
 }: {
   shops: DexShop[];
+  citySlug: string;
   initiallyVisited: string[];
   signedIn: boolean;
 }) {
@@ -131,7 +133,7 @@ export function DexGrid({
                 ☕
               </span>
               <Link
-                href={`/shops/${shop.dex_number}`}
+                href={`/shops/${citySlug}/${shop.dex_number}`}
                 className={
                   isVisited
                     ? "font-heading text-base font-semibold hover:underline"

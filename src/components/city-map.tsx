@@ -5,8 +5,10 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { divIcon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Central Stockholm — Gamla Stan.
-const STOCKHOLM_CENTER: [number, number] = [59.3293, 18.0686];
+// Just a sane fallback if a caller omits `center` — every real caller
+// currently passes an explicit one (a shop's own coordinates, or a
+// city's shop centroid), so this rarely if ever applies.
+const FALLBACK_CENTER: [number, number] = [59.3293, 18.0686];
 
 export type MapShop = {
   id: string;
@@ -29,9 +31,10 @@ const shopIcon = divIcon({
   popupAnchor: [0, -28],
 });
 
-export function StockholmMap({
+export function CityMap({
   shops,
-  center = STOCKHOLM_CENTER,
+  citySlug,
+  center = FALLBACK_CENTER,
   zoom = 13,
   // Popups link to the shop detail page by default — the shop detail
   // page itself reuses this same component for its own pinpoint map,
@@ -41,6 +44,7 @@ export function StockholmMap({
   linkToDetail = true,
 }: {
   shops: MapShop[];
+  citySlug: string;
   center?: [number, number];
   zoom?: number;
   linkToDetail?: boolean;
@@ -67,7 +71,7 @@ export function StockholmMap({
             </p>
             {linkToDetail && (
               <Link
-                href={`/shops/${shop.dex_number}`}
+                href={`/shops/${citySlug}/${shop.dex_number}`}
                 className="text-sm underline underline-offset-4"
               >
                 View details →

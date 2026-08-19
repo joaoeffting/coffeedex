@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { deleteReview } from "@/app/shops/[dexNumber]/actions";
+import { deleteReview } from "@/app/shops/[city]/[dexNumber]/actions";
 
 type Review = {
   id: string;
@@ -12,10 +12,12 @@ type Review = {
 export function ReviewList({
   reviews,
   currentUserId,
+  citySlug,
   dexNumber,
 }: {
   reviews: Review[];
   currentUserId: string | null;
+  citySlug: string;
   dexNumber: number;
 }) {
   if (reviews.length === 0) {
@@ -52,7 +54,14 @@ export function ReviewList({
                 {new Date(review.created_at).toLocaleDateString()}
               </time>
               {review.user_id === currentUserId && (
-                <form action={deleteReview.bind(null, review.id, dexNumber)}>
+                <form
+                  action={deleteReview.bind(
+                    null,
+                    review.id,
+                    citySlug,
+                    dexNumber,
+                  )}
+                >
                   <button
                     type="submit"
                     className="text-destructive underline underline-offset-2"

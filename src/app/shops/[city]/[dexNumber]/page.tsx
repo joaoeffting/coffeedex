@@ -3,21 +3,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Star, MapPin, ExternalLink } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
-import { StockholmMapLoader } from "@/components/stockholm-map-loader";
+import { CityMapLoader } from "@/components/city-map-loader";
 import { Badge } from "@/components/ui/badge";
 import { ReviewForm } from "@/components/review-form";
 import { ReviewList } from "@/components/review-list";
+import { RememberCity } from "@/components/remember-city";
+import { citySlug } from "@/lib/city";
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ dexNumber: string }>;
+  params: Promise<{ city: string; dexNumber: string }>;
 }): Promise<Metadata> {
-  const { dexNumber } = await params;
+  const { city, dexNumber } = await params;
   const supabase = await createClient();
   const { data: shop } = await supabase
     .from("coffee_shops")
     .select("name, neighborhood, description")
+    .ilike("city", city)
     .eq("dex_number", Number(dexNumber))
     .maybeSingle();
 
@@ -33,10 +36,10 @@ export default async function ShopDetailPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ dexNumber: string }>;
+  params: Promise<{ city: string; dexNumber: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { dexNumber } = await params;
+  const { city, dexNumber } = await params;
   const { review_error: reviewError } = await searchParams;
   const dexNum = Number(dexNumber);
   if (!Number.isInteger(dexNum)) notFound();
@@ -45,6 +48,7 @@ export default async function ShopDetailPage({
   const { data: shop } = await supabase
     .from("coffee_shops")
     .select("*")
+    .ilike("city", city)
     .eq("dex_number", dexNum)
     .maybeSingle();
 
@@ -76,8 +80,9 @@ export default async function ShopDetailPage({
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
+      <RememberCity citySlug={citySlug(shop.city)} />
       <Link
-        href="/discover"
+        href={`/discover/${citySlug(shop.city)}`}
         className="text-sm text-muted-foreground hover:text-foreground"
       >
         ← Back to Discover
@@ -135,8 +140,9 @@ export default async function ShopDetailPage({
       <p>{shop.description}</p>
 
       <div className="h-64">
-        <StockholmMapLoader
+        <CityMapLoader
           shops={[shop]}
+          citySlug={citySlug(shop.city)}
           center={[shop.lat, shop.lng]}
           zoom={15}
           linkToDetail={false}
@@ -168,6 +174,7 @@ export default async function ShopDetailPage({
         <h2 className="font-heading text-xl font-semibold">Reviews</h2>
         <ReviewForm
           shopId={shop.id}
+          citySlug={citySlug(shop.city)}
           dexNumber={shop.dex_number}
           signedIn={currentUserId != null}
           existing={myReview}
@@ -178,6 +185,7 @@ export default async function ShopDetailPage({
         <ReviewList
           reviews={myReview ? [myReview, ...otherReviews] : otherReviews}
           currentUserId={currentUserId}
+          citySlug={citySlug(shop.city)}
           dexNumber={shop.dex_number}
         />
       </div>

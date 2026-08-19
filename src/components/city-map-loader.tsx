@@ -1,14 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { MapShop } from "@/components/stockholm-map";
+import type { MapShop } from "@/components/city-map";
 
 // Leaflet touches `window` during map initialization — ssr: false keeps it
 // out of the server render entirely rather than fighting a hydration
 // mismatch. `dynamic(..., { ssr: false })` is only valid inside a Client
 // Component, hence this thin wrapper around the Server Component page.
-const StockholmMap = dynamic(
-  () => import("@/components/stockholm-map").then((mod) => mod.StockholmMap),
+const CityMap = dynamic(
+  () => import("@/components/city-map").then((mod) => mod.CityMap),
   {
     ssr: false,
     loading: () => (
@@ -19,20 +19,23 @@ const StockholmMap = dynamic(
   },
 );
 
-export function StockholmMapLoader({
+export function CityMapLoader({
   shops,
+  citySlug,
   center,
   zoom,
   linkToDetail,
 }: {
   shops: MapShop[];
+  citySlug: string;
   center?: [number, number];
   zoom?: number;
   linkToDetail?: boolean;
 }) {
   return (
-    <StockholmMap
+    <CityMap
       shops={shops}
+      citySlug={citySlug}
       center={center}
       zoom={zoom}
       linkToDetail={linkToDetail}

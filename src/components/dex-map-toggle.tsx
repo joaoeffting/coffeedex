@@ -1,10 +1,16 @@
 import Link from "next/link";
 
-export function DexMapToggle({ active }: { active: "dex" | "map" }) {
+export function DexMapToggle({
+  citySlug,
+  active,
+}: {
+  citySlug: string;
+  active: "dex" | "map";
+}) {
   return (
     <div className="dex-outline flex overflow-hidden rounded-full">
       <Link
-        href="/dex"
+        href={`/dex/${citySlug}`}
         className={
           active === "dex"
             ? "bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground"
@@ -14,7 +20,7 @@ export function DexMapToggle({ active }: { active: "dex" | "map" }) {
         Dex
       </Link>
       <Link
-        href="/discover"
+        href={`/discover/${citySlug}`}
         className={
           active === "map"
             ? "bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground"

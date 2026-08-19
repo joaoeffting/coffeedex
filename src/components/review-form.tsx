@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { StarRatingInput } from "@/components/star-rating-input";
 import { Button } from "@/components/ui/button";
-import { upsertReview } from "@/app/shops/[dexNumber]/actions";
+import { upsertReview } from "@/app/shops/[city]/[dexNumber]/actions";
 
 export function ReviewForm({
   shopId,
+  citySlug,
   dexNumber,
   signedIn,
   existing,
   error,
 }: {
   shopId: string;
+  citySlug: string;
   dexNumber: number;
   signedIn: boolean;
   existing: { rating: number; comment: string | null } | null;
@@ -29,7 +31,7 @@ export function ReviewForm({
 
   return (
     <form
-      action={upsertReview.bind(null, shopId, dexNumber)}
+      action={upsertReview.bind(null, shopId, citySlug, dexNumber)}
       className="space-y-3 rounded-lg border border-border p-4"
     >
       <p className="text-sm font-medium">

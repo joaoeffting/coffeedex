@@ -1,8 +1,27 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cityDisplayName } from "@/lib/city";
+import { getStoredCitySlug } from "@/lib/city-preference";
+
+// No real subscription needed — this is just the React-approved way to
+// read localStorage without a server/client mismatch on first paint (see
+// ChangeCityPicker for the same pattern).
+function subscribe() {
+  return () => {};
+}
 
 export default function Home() {
+  const citySlug = useSyncExternalStore(
+    subscribe,
+    getStoredCitySlug,
+    () => null,
+  );
+  const city = cityDisplayName(citySlug ?? "stockholm");
+
   return (
     <main className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md flex-col items-center justify-center gap-8 px-6 py-12 text-center">
       <Card className="dex-outline w-full items-center bg-accent px-6 py-10 text-accent-foreground">
@@ -13,14 +32,14 @@ export default function Home() {
             ☕
           </div>
           <p className="font-heading text-sm font-medium uppercase tracking-wide">
-            Stockholm · #001
+            {city} · #001
           </p>
         </CardContent>
       </Card>
 
       <div className="space-y-2">
         <h1 className="font-heading text-3xl font-semibold text-balance">
-          Collect Stockholm&apos;s coffee shops
+          Collect {city}&apos;s coffee shops
         </h1>
         <p className="text-muted-foreground text-balance">
           Visit a real cafe, mark it visited, and watch your personal album
