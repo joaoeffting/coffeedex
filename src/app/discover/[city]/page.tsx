@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { CityMapLoader } from "@/components/city-map-loader";
 import { DexMapToggle } from "@/components/dex-map-toggle";
 import { RememberCity } from "@/components/remember-city";
+import { resolveShopRating } from "@/lib/shop-rating";
 
 export async function generateMetadata({
   params,
@@ -27,11 +28,26 @@ export default async function DiscoverPage({
 
   const { data: shops } = await supabase
     .from("coffee_shops")
-    .select("id, dex_number, name, neighborhood, lat, lng, city")
+    .select("id, dex_number, name, neighborhood, lat, lng, city, rating")
     .ilike("city", city)
     .order("dex_number");
 
   if (!shops || shops.length === 0) notFound();
+
+  const { data: reviews } = await supabase
+    .from("shop_reviews")
+    .select("shop_id, rating")
+    .in(
+      "shop_id",
+      shops.map((s) => s.id),
+    );
+
+  const reviewRatingsByShop = new Map<string, number[]>();
+  for (const review of reviews ?? []) {
+    const list = reviewRatingsByShop.get(review.shop_id) ?? [];
+    list.push(review.rating);
+    reviewRatingsByShop.set(review.shop_id, list);
+  }
 
   const cityName = shops[0].city;
   // No fixed per-city coordinates to maintain — the centroid of that
@@ -41,6 +57,11 @@ export default async function DiscoverPage({
     shops.reduce((sum, s) => sum + s.lat, 0) / shops.length,
     shops.reduce((sum, s) => sum + s.lng, 0) / shops.length,
   ];
+
+  const mapShops = shops.map((shop) => ({
+    ...shop,
+    ...resolveShopRating(shop.rating, reviewRatingsByShop.get(shop.id) ?? []),
+  }));
 
   return (
     <main className="mx-auto flex h-[calc(100vh-8rem)] max-w-4xl flex-col gap-4 px-4 py-6">
@@ -57,7 +78,7 @@ export default async function DiscoverPage({
         <DexMapToggle citySlug={city} active="map" />
       </div>
       <div className="min-h-0 flex-1">
-        <CityMapLoader shops={shops} citySlug={city} center={center} />
+        <CityMapLoader shops={mapShops} citySlug={city} center={center} />
       </div>
     </main>
   );

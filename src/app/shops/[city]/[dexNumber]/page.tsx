@@ -141,7 +141,9 @@ export default async function ShopDetailPage({
 
       <div className="h-64">
         <CityMapLoader
-          shops={[shop]}
+          shops={[
+            { ...shop, rating: liveRating ?? shop.rating, reviewCount: allReviews.length },
+          ]}
           citySlug={citySlug(shop.city)}
           center={[shop.lat, shop.lng]}
           zoom={15}

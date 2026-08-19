@@ -8,6 +8,7 @@ import { AnalyticsConsentBanner } from "@/components/analytics-consent-banner";
 import { CookiePreferencesLink } from "@/components/cookie-preferences-link";
 import { PostHogPageview } from "@/components/posthog-pageview";
 import { NavAuthLinks } from "@/components/nav-auth-links";
+import { IosInstallPrompt } from "@/components/ios-install-prompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,9 @@ export const metadata: Metadata = {
     siteName: "Coffeedex",
     locale: "en_US",
     type: "website",
+  },
+  appleWebApp: {
+    title: "Coffeedex",
   },
 };
 
@@ -94,6 +98,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </p>
           </footer>
           <AnalyticsConsentBanner />
+          <IosInstallPrompt />
         </Providers>
       </body>
     </html>

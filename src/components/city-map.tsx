@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { divIcon } from "leaflet";
+import { Star } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
 // Just a sane fallback if a caller omits `center` — every real caller
@@ -17,6 +18,11 @@ export type MapShop = {
   neighborhood: string;
   lat: number;
   lng: number;
+  // Live coffeedex average when reviews exist, falling back to the
+  // curated snapshot rating otherwise — same resolution the shop detail
+  // page uses, so the popup and the detail page never disagree.
+  rating: number | null;
+  reviewCount: number;
 };
 
 // divIcon's `html` is raw innerHTML, not React-escaped — shop names are
@@ -98,6 +104,20 @@ export function CityMap({
             <p className="text-sm text-muted-foreground">
               {shop.neighborhood}
             </p>
+            {shop.rating != null && (
+              <p className="flex items-center gap-1 text-sm">
+                <Star
+                  className="h-3.5 w-3.5 fill-primary text-primary"
+                  aria-hidden="true"
+                />
+                <span className="font-medium">{shop.rating.toFixed(1)}</span>
+                {shop.reviewCount > 0 && (
+                  <span className="text-muted-foreground">
+                    ({shop.reviewCount})
+                  </span>
+                )}
+              </p>
+            )}
             {linkToDetail && (
               <Link
                 href={`/shops/${citySlug}/${shop.dex_number}`}
