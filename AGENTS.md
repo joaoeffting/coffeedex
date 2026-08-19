@@ -29,6 +29,17 @@ There's no `SUPABASE_SERVICE_ROLE_KEY` in this project, on purpose — don't add
 
 If the user already has `npm run dev` running, don't kill it, restart it, or reuse its port to test something. Use an isolated `git worktree` on a separate port instead: `git worktree add /tmp/coffeedex-test-wt -b test-<feature>`, copy over the changed files plus `.env.local` and a copy of `node_modules` (rsync, not a symlink — Turbopack panics on a symlink pointing outside the worktree root), then `PORT=<other> npx next dev -p <other>` from that worktree directory.
 
+## New features need Playwright integration test coverage
+
+This is a portfolio project — test coverage is part of what it's demonstrating, not optional polish. When adding a feature (a new page, a server action that mutates data, a meaningful interaction), add a spec in `tests/` alongside it rather than treating tests as a separate follow-up pass. See `tests/README.md` for how the suite is set up and run (`npm run test:e2e`).
+
+A few things that make this suite different from a typical setup, worth knowing before adding to it:
+
+- No direct DB seeding or reads — no `SUPABASE_SERVICE_ROLE_KEY` exists here (see below), so specs interact only through the real UI, same as a real user would.
+- `tests/global-setup.ts` signs up a fresh throwaway account every run (coffeedex-dev has email confirmation off) rather than requiring a pre-created test account.
+- Shops are curated, shared fixtures, not per-run seeded data — specs target a known stable shop (Stockholm dex #1) and **must clean up what they create** (delete a review, unmark a shop visited) so repeated runs don't leave test junk on that shop's real page. A run that fails before its cleanup step can leave orphaned rows behind — check for and clean up `shop_reviews`/`visited_shops` rows with obviously-test content if a run fails partway.
+- Only ever run this against `coffeedex-dev` (the suite is hardcoded to `localhost:3100`, which always runs against `.env.local`) — never point it at prod.
+
 ## Never commit or push without being explicitly asked
 
 Finishing and verifying a change is not the same as being told to commit it. Leave the working tree as-is and say the change is ready — let the user decide when it becomes a commit, and never push without being asked either.
