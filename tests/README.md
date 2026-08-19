@@ -27,6 +27,9 @@ than starting a second instance. Otherwise it starts one itself.
 - `multi-city.spec.ts` — switch city via `/change-city`, verify the Dex shows
   that city's shops, verify the choice persists (bare `/dex` redirects to the
   last-picked city, not always Stockholm)
+- `geolocation.spec.ts` — "locate me" button toggles on/off (Playwright can
+  mock geolocation via `test.use({ geolocation, permissions })`, so this is
+  actually testable unlike the Leaflet marker DOM below)
 
 ## What's not covered (yet)
 
