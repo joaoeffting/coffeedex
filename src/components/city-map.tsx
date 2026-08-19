@@ -19,17 +19,42 @@ export type MapShop = {
   lng: number;
 };
 
+// divIcon's `html` is raw innerHTML, not React-escaped — shop names are
+// curator-entered today, not user-generated, but escaping costs nothing
+// and stops this from becoming an XSS hole if that ever changes.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // A plain emoji divIcon, not Leaflet's default marker image — the default
 // bundles two PNGs via relative paths that break under most bundlers
 // (Turbopack included) unless separately patched. A divIcon sidesteps
 // that entirely and reads as more on-brand than a generic pin anyway.
-const shopIcon = divIcon({
-  html: '<span style="font-size: 28px; line-height: 1;">☕</span>',
-  className: "",
-  iconSize: [28, 28],
-  iconAnchor: [14, 28],
-  popupAnchor: [0, -28],
-});
+//
+// The name label is absolutely positioned below the emoji rather than
+// sized into the icon's own box — Leaflet's iconSize/iconAnchor drive
+// where the *pin* lands on the coordinate, and a variable-width label
+// would throw that off if it were part of the sized box instead of
+// floating free underneath it.
+function buildShopIcon(name: string) {
+  return divIcon({
+    html: `
+      <div style="position: relative;">
+        <span style="font-size: 26px; line-height: 1;">☕</span>
+        <span style="position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--card, #fffbf2); border: 2px solid var(--border, #2b1d12); border-radius: 999px; padding: 1px 7px; font-size: 11px; font-weight: 600; font-family: var(--font-heading), sans-serif; color: var(--foreground, #2b1d12); box-shadow: 2px 2px 0 0 var(--border, #2b1d12);">${escapeHtml(name)}</span>
+      </div>
+    `,
+    className: "",
+    iconSize: [26, 26],
+    iconAnchor: [13, 26],
+    popupAnchor: [0, -26],
+  });
+}
 
 export function CityMap({
   shops,
@@ -61,7 +86,11 @@ export function CityMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {shops.map((shop) => (
-        <Marker key={shop.id} position={[shop.lat, shop.lng]} icon={shopIcon}>
+        <Marker
+          key={shop.id}
+          position={[shop.lat, shop.lng]}
+          icon={buildShopIcon(shop.name)}
+        >
           <Popup>
             <p className="font-heading font-semibold">
               #{shop.dex_number} {shop.name}
