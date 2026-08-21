@@ -38,7 +38,7 @@ export default async function ChangeCityPage({
 
       <Link
         href="/"
-        className="inline-block text-sm text-muted-foreground hover:text-foreground"
+        className="inline-block text-sm text-muted-foreground transition-colors hover:text-foreground active:text-foreground"
       >
         ← Back home
       </Link>

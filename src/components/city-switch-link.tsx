@@ -18,7 +18,7 @@ export function CitySwitchLink({
   return (
     <Link
       href={`/change-city?from=${section}`}
-      className="inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-border bg-card px-3 py-1 text-sm font-medium hover:bg-muted"
+      className="inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-border bg-card px-3 py-1 text-sm font-medium transition-colors hover:bg-muted active:bg-muted"
     >
       <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
       Change city

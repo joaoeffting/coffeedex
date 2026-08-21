@@ -60,8 +60,8 @@ export function BottomNavBar({ isLoggedIn }: { isLoggedIn: boolean }) {
             <span
               className={
                 tab.active
-                  ? "flex h-[30px] w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground"
-                  : "flex h-[30px] w-11 items-center justify-center rounded-2xl text-muted-foreground"
+                  ? "flex h-[30px] w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground transition-colors active:bg-primary/80"
+                  : "flex h-[30px] w-11 items-center justify-center rounded-2xl text-muted-foreground transition-colors active:bg-muted"
               }
             >
               <tab.icon className="h-5 w-5" aria-hidden="true" />

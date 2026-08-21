@@ -48,7 +48,7 @@ export function VisitedToggle({
           type="button"
           onClick={toggle}
           disabled={isPending}
-          className="text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
+          className="text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors active:text-foreground disabled:opacity-60"
         >
           Unmark
         </button>

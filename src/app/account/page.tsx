@@ -74,7 +74,7 @@ export default async function AccountPage() {
             <Link
               key={city}
               href={`/dex/${citySlug(city)}`}
-              className="dex-outline flex items-center justify-between gap-4 rounded-2xl bg-card px-4 py-3 hover:bg-muted"
+              className="dex-outline dex-press flex items-center justify-between gap-4 rounded-2xl bg-card px-4 py-3 hover:bg-muted"
             >
               <div>
                 <p className="font-heading font-semibold">{city}</p>

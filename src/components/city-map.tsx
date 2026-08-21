@@ -350,7 +350,7 @@ export function CityMap({
                           type="button"
                           onClick={() => toggleVisited(shop.id)}
                           disabled={isPending}
-                          className="text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
+                          className="text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors active:text-foreground disabled:opacity-60"
                         >
                           Unmark
                         </button>
@@ -375,7 +375,7 @@ export function CityMap({
                 {linkToDetail && (
                   <Link
                     href={`/shops/${citySlug}/${shop.dex_number}`}
-                    className="text-sm underline underline-offset-4"
+                    className="text-sm underline underline-offset-4 active:opacity-70"
                   >
                     View details →
                   </Link>
@@ -413,8 +413,8 @@ export function CityMap({
         aria-label={locating ? "Stop showing my location" : "Show my location"}
         className={
           locating
-            ? "dex-outline absolute top-3 right-3 z-[1000] flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground"
-            : "dex-outline absolute top-3 right-3 z-[1000] flex size-9 items-center justify-center rounded-full bg-card text-foreground hover:bg-muted"
+            ? "dex-outline dex-press absolute top-3 right-3 z-[1000] flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground"
+            : "dex-outline dex-press absolute top-3 right-3 z-[1000] flex size-9 items-center justify-center rounded-full bg-card text-foreground hover:bg-muted"
         }
       >
         <LocateFixed className="h-4 w-4" aria-hidden="true" />

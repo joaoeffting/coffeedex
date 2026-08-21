@@ -121,6 +121,20 @@
   box-shadow: 4px 4px 0 0 var(--border);
 }
 
+/* Tap/press feedback for a dex-outline button or link — the shadow
+   "flattens" as if the element were physically pushed into it. Added
+   alongside .dex-outline on interactive elements only (never the
+   decorative card wrappers that also use .dex-outline). :active fires
+   on tap, unlike hover-only feedback which never shows on a touch
+   device — most of this app's actual usage. */
+.dex-press {
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+.dex-press:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 var(--border);
+}
+
 /* App's own primary green for a visited shop's border — layered after
    .dex-outline so it wins on the border-color property alone; the shadow
    stays the normal black outline color, so this reads as "same card,

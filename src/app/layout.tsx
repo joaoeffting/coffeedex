@@ -74,13 +74,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <nav className="hidden items-center gap-4 md:flex">
                 <Link
                   href="/dex"
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground active:text-foreground"
                 >
                   Dex
                 </Link>
                 <Link
                   href="/saved"
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  className="text-sm text-muted-foreground transition-colors hover:text-foreground active:text-foreground"
                 >
                   Saved
                 </Link>

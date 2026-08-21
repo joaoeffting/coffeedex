@@ -45,8 +45,8 @@ export function ChangeCityPicker({
             onClick={() => choose(city)}
             className={
               isCurrent
-                ? "dex-outline rounded-2xl bg-accent px-4 py-3 text-left font-heading text-lg font-semibold text-accent-foreground"
-                : "dex-outline rounded-2xl bg-card px-4 py-3 text-left font-heading text-lg font-semibold hover:bg-muted"
+                ? "dex-outline dex-press rounded-2xl bg-accent px-4 py-3 text-left font-heading text-lg font-semibold text-accent-foreground"
+                : "dex-outline dex-press rounded-2xl bg-card px-4 py-3 text-left font-heading text-lg font-semibold hover:bg-muted"
             }
           >
             {city}

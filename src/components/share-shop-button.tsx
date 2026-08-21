@@ -37,7 +37,7 @@ export function ShareShopButton({
     <button
       type="button"
       onClick={handleShare}
-      className="flex items-center gap-1.5 rounded-lg border-2 border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-muted"
+      className="flex items-center gap-1.5 rounded-lg border-2 border-border bg-card px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted active:bg-muted"
     >
       {copied ? (
         <>

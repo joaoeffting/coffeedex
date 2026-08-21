@@ -72,7 +72,7 @@ export function SavedGrid({
           <span className="text-2xl">☕</span>
           <Link
             href={`/shops/${citySlug}/${shop.dex_number}`}
-            className="font-heading text-base font-semibold hover:underline"
+            className="font-heading text-base font-semibold hover:underline active:underline"
           >
             {shop.name}
           </Link>
@@ -93,7 +93,7 @@ export function SavedGrid({
             type="button"
             onClick={() => unsave(shop.id)}
             disabled={isPending}
-            className="mt-auto flex items-center gap-1 pt-1 text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
+            className="mt-auto flex items-center gap-1 pt-1 text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors active:text-foreground disabled:opacity-60"
           >
             <Bookmark className="h-3 w-3 fill-current" aria-hidden="true" />
             Unsave

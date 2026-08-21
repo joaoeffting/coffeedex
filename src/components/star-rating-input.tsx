@@ -30,7 +30,7 @@ export function StarRatingInput({
           onClick={() => setSelected(n)}
           onMouseEnter={() => setHovered(n)}
           aria-label={`${n} star${n === 1 ? "" : "s"}`}
-          className="dex-outline rounded"
+          className="dex-outline dex-press rounded"
         >
           <Star
             className={

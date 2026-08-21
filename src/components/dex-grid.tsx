@@ -93,7 +93,7 @@ export function DexGrid({
             className={
               filter === f
                 ? "rounded-full border-2 border-border bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground"
-                : "rounded-full border-2 border-border bg-card px-3 py-1 text-sm font-semibold hover:bg-muted"
+                : "rounded-full border-2 border-border bg-card px-3 py-1 text-sm font-semibold transition-colors hover:bg-muted active:bg-muted"
             }
           >
             {f === "all" && `All (${shops.length})`}
@@ -145,8 +145,8 @@ export function DexGrid({
                 href={`/shops/${citySlug}/${shop.dex_number}`}
                 className={
                   isVisited
-                    ? "font-heading text-base font-semibold hover:underline"
-                    : "font-heading text-base font-semibold text-muted-foreground hover:underline"
+                    ? "font-heading text-base font-semibold hover:underline active:underline"
+                    : "font-heading text-base font-semibold text-muted-foreground hover:underline active:underline"
                 }
               >
                 {shop.name}
@@ -175,7 +175,7 @@ export function DexGrid({
                       type="button"
                       onClick={() => toggle(shop.id)}
                       disabled={isPending}
-                      className="text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
+                      className="text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors active:text-foreground disabled:opacity-60"
                     >
                       Unmark visited
                     </button>

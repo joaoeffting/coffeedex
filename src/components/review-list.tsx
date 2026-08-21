@@ -64,7 +64,7 @@ export function ReviewList({
                 >
                   <button
                     type="submit"
-                    className="text-destructive underline underline-offset-2"
+                    className="text-destructive underline underline-offset-2 transition-opacity active:opacity-70"
                   >
                     Delete
                   </button>

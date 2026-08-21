@@ -145,7 +145,7 @@ export default async function ShopDetailPage({
       <RememberCity citySlug={citySlug(shop.city)} />
       <Link
         href={`/discover/${citySlug(shop.city)}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
+        className="text-sm text-muted-foreground transition-colors hover:text-foreground active:text-foreground"
       >
         ← Back to Discover
       </Link>
@@ -229,7 +229,7 @@ export default async function ShopDetailPage({
           href={googleMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="dex-outline flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          className="dex-outline dex-press flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Open in Google Maps
           <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
@@ -238,7 +238,7 @@ export default async function ShopDetailPage({
           href={appleMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted"
+          className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted active:bg-muted"
         >
           Open in Apple Maps
           <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />

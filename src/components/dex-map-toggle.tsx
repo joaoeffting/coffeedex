@@ -14,7 +14,7 @@ export function DexMapToggle({
         className={
           active === "dex"
             ? "bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground"
-            : "bg-card px-4 py-1.5 text-sm font-semibold hover:bg-muted"
+            : "bg-card px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-muted active:bg-muted"
         }
       >
         Dex
@@ -24,7 +24,7 @@ export function DexMapToggle({
         className={
           active === "map"
             ? "bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground"
-            : "bg-card px-4 py-1.5 text-sm font-semibold hover:bg-muted"
+            : "bg-card px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-muted active:bg-muted"
         }
       >
         Map

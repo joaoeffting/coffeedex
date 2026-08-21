@@ -7,7 +7,10 @@ import { clearStoredConsent } from "@/lib/analytics-consent";
 // since either way it just re-asks.
 export function CookiePreferencesLink() {
   return (
-    <button onClick={() => clearStoredConsent()} className="hover:text-foreground">
+    <button
+      onClick={() => clearStoredConsent()}
+      className="transition-colors hover:text-foreground active:text-foreground"
+    >
       Cookie preferences
     </button>
   );
