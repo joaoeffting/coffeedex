@@ -103,7 +103,16 @@ export function DexGrid({
         ))}
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
+      {/* select-none on the whole grid, not just the hold button — when a
+          long-press lands on a select-none target, mobile browsers fall
+          back to selecting the nearest selectable text instead of doing
+          nothing, and a dense grid of shop names/tags always has some
+          nearby candidate. No selectable text nearby means nothing to
+          fall back to. */}
+      <div
+        style={{ WebkitTouchCallout: "none" }}
+        className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4 select-none"
+      >
         {visibleShops.map((shop) => {
           const isVisited = visited.has(shop.id);
           return (
