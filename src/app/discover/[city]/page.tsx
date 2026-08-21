@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { CityMapLoader } from "@/components/city-map-loader";
 import { DexMapToggle } from "@/components/dex-map-toggle";
 import { RememberCity } from "@/components/remember-city";
+import { CitySwitchLink } from "@/components/city-switch-link";
 import { resolveShopRating } from "@/lib/shop-rating";
 
 export async function generateMetadata({
@@ -92,6 +93,9 @@ export default async function DiscoverPage({
           <p className="text-sm text-muted-foreground">
             {shops.length} {cityName} coffee shops — tap a pin to see which.
           </p>
+          <div className="mt-2">
+            <CitySwitchLink section="discover" />
+          </div>
         </div>
         <DexMapToggle citySlug={city} active="map" />
       </div>

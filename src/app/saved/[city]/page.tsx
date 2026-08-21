@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { SavedGrid } from "@/components/saved-grid";
 import { RememberCity } from "@/components/remember-city";
+import { CitySwitchLink } from "@/components/city-switch-link";
 
 // A saved list is inherently personal (same as visited_shops — no
 // public-read RLS policy either), so this page requires a session
@@ -55,6 +56,9 @@ export default async function SavedPage({
         <p className="text-muted-foreground">
           Shops you&apos;ve bookmarked to visit.
         </p>
+        <div className="mt-2">
+          <CitySwitchLink section="saved" />
+        </div>
       </div>
 
       <SavedGrid shops={savedShops} citySlug={city} />

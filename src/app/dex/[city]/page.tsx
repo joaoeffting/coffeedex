@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { DexGrid } from "@/components/dex-grid";
 import { DexMapToggle } from "@/components/dex-map-toggle";
 import { RememberCity } from "@/components/remember-city";
+import { CitySwitchLink } from "@/components/city-switch-link";
 
 export async function generateMetadata({
   params,
@@ -61,6 +62,9 @@ export default async function DexPage({
             {cityName} — mark one visited once you&apos;ve actually had a
             cup there.
           </p>
+          <div className="mt-2">
+            <CitySwitchLink section="dex" />
+          </div>
         </div>
         <DexMapToggle citySlug={city} active="dex" />
       </div>

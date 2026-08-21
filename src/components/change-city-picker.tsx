@@ -13,7 +13,13 @@ function subscribe() {
   return () => {};
 }
 
-export function ChangeCityPicker({ cities }: { cities: string[] }) {
+export function ChangeCityPicker({
+  cities,
+  returnSection = "dex",
+}: {
+  cities: string[];
+  returnSection?: "dex" | "discover" | "saved";
+}) {
   const router = useRouter();
   const current = useSyncExternalStore(
     subscribe,
@@ -24,7 +30,7 @@ export function ChangeCityPicker({ cities }: { cities: string[] }) {
   function choose(city: string) {
     const slug = citySlug(city);
     setStoredCitySlug(slug);
-    router.push(`/dex/${slug}`);
+    router.push(`/${returnSection}/${slug}`);
   }
 
   return (
