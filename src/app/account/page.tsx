@@ -1,9 +1,18 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import { citySlug } from "@/lib/city";
 import { logout } from "../login/actions";
+
+// Belt-and-suspenders alongside robots.ts's disallow — a noindex meta tag
+// holds even if a crawler ignores robots.txt or reaches this URL via a
+// stray external link before the auth redirect above kicks in.
+export const metadata: Metadata = {
+  title: "Your account",
+  robots: { index: false, follow: false },
+};
 
 export default async function AccountPage() {
   const supabase = await createClient();

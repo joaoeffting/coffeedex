@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Star, MapPin, ExternalLink } from "lucide-react";
@@ -9,6 +10,7 @@ import { ReviewForm } from "@/components/review-form";
 import { ReviewList } from "@/components/review-list";
 import { RememberCity } from "@/components/remember-city";
 import { citySlug } from "@/lib/city";
+import { safeJsonLd } from "@/lib/json-ld";
 
 export async function generateMetadata({
   params,
@@ -77,9 +79,45 @@ export default async function ShopDetailPage({
   // instead of just centering the map on a coordinate.
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${shop.name}, ${shop.address}`)}`;
   const appleMapsUrl = `https://maps.apple.com/?ll=${shop.lat},${shop.lng}&q=${encodeURIComponent(shop.name)}`;
+  const nonce = (await headers()).get("x-nonce");
 
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-4 py-8">
+      <script
+        type="application/ld+json"
+        nonce={nonce ?? undefined}
+        // Structured data so search engines can understand this page is
+        // specifically a cafe listing (name, address, geo, rating), not
+        // just a blob of text — can surface richer results than a plain
+        // title/description.
+        dangerouslySetInnerHTML={{
+          __html: safeJsonLd({
+            "@context": "https://schema.org",
+            "@type": "CafeOrCoffeeShop",
+            name: shop.name,
+            description: shop.description,
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: shop.address,
+              addressLocality: shop.city,
+            },
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: shop.lat,
+              longitude: shop.lng,
+            },
+            ...(liveRating != null
+              ? {
+                  aggregateRating: {
+                    "@type": "AggregateRating",
+                    ratingValue: liveRating,
+                    reviewCount: allReviews.length,
+                  },
+                }
+              : {}),
+          }),
+        }}
+      />
       <RememberCity citySlug={citySlug(shop.city)} />
       <Link
         href={`/discover/${citySlug(shop.city)}`}

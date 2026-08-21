@@ -5,6 +5,7 @@ import { getCities } from "@/lib/get-cities";
 
 export const metadata: Metadata = {
   title: "Change City",
+  robots: { index: false, follow: false },
 };
 
 export default async function ChangeCityPage() {
