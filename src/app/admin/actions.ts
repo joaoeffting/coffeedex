@@ -1,8 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-
-const ADMIN_EMAIL = "joaoeffting@gmail.com";
+import { isAdmin } from "@/lib/admin";
 
 export type AdminUserRow = {
   id: string;
@@ -11,7 +10,7 @@ export type AdminUserRow = {
   last_sign_in_at: string | null;
 };
 
-// Defense in depth alongside admin_list_users()'s own email check — the
+// Defense in depth alongside admin_list_users()'s own role check — the
 // DB function is the real gate (it'd reject any other caller outright),
 // this just avoids a round-trip for the common "not admin" case.
 export async function listUsers(): Promise<
@@ -19,7 +18,7 @@ export async function listUsers(): Promise<
 > {
   const supabase = await createClient();
   const { data, error: authError } = await supabase.auth.getClaims();
-  if (authError || data?.claims.email !== ADMIN_EMAIL) {
+  if (authError || !isAdmin(data?.claims)) {
     return { ok: false, error: "Not authorized" };
   }
 

@@ -2,17 +2,17 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { AdminUserList } from "@/components/admin-user-list";
+import { isAdmin } from "@/lib/admin";
 
-// Not linked from anywhere in the app's own nav — reached by URL only.
-// The real access control is admin_get_stats() itself (hard-gated to one
-// email inside the function body); this redirect is just so a non-admin
-// hitting the URL sees a normal navigation instead of an error page.
+// Only linked from Account, and only for that one account — not a
+// general nav item. The real access control is admin_get_stats() itself
+// (hard-gated to the app_metadata role claim inside the function body);
+// this redirect is just so a non-admin hitting the URL directly sees a
+// normal navigation instead of an error page.
 export const metadata: Metadata = {
   title: "Admin",
   robots: { index: false, follow: false },
 };
-
-const ADMIN_EMAIL = "joaoeffting@gmail.com";
 
 type AdminStats = {
   total_users: number;
@@ -35,7 +35,7 @@ export default async function AdminPage() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
 
-  if (error || !data?.claims || data.claims.email !== ADMIN_EMAIL) {
+  if (error || !isAdmin(data?.claims)) {
     redirect("/");
   }
 

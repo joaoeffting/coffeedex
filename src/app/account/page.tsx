@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import { citySlug } from "@/lib/city";
+import { isAdmin } from "@/lib/admin";
 import { logout } from "../login/actions";
 
 // Belt-and-suspenders alongside robots.ts's disallow — a noindex meta tag
@@ -100,6 +101,13 @@ export default async function AccountPage() {
       )}
 
       <div className="space-y-2">
+        {isAdmin(data.claims) && (
+          <Button
+            variant="outline"
+            className="w-full"
+            render={<Link href="/admin">Admin</Link>}
+          />
+        )}
         <Button
           variant="outline"
           className="w-full"
