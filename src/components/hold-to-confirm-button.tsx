@@ -24,7 +24,15 @@ export function HoldToConfirmButton({
   const [holding, setHolding] = useState(false);
   const firedRef = useRef(false);
 
-  function start() {
+  // preventDefault here, not just select-none in the className below —
+  // select-none stops CSS text selection but not iOS Safari's long-press
+  // callout (the magnifier + selection UI, a separate `-webkit-touch-
+  // callout` mechanism) or Android Chrome's own long-press word-select,
+  // both of which can grab whatever text sits nearest the touch point
+  // once the hold passes their threshold. Suppressing the pointer
+  // event's default is what actually stops those gestures from starting.
+  function start(e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault();
     firedRef.current = false;
     setHolding(true);
   }
@@ -53,6 +61,7 @@ export function HoldToConfirmButton({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onConfirm();
       }}
+      style={{ WebkitTouchCallout: "none" }}
       className={`relative touch-none overflow-hidden select-none ${className ?? ""}`}
     >
       <span
