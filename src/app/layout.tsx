@@ -76,6 +76,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   Dex
                 </Link>
                 <Link
+                  href="/saved"
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Saved
+                </Link>
+                <Link
                   href="/change-city"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >

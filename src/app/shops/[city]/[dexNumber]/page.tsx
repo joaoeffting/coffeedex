@@ -10,8 +10,12 @@ import { ReviewForm } from "@/components/review-form";
 import { ReviewList } from "@/components/review-list";
 import { RememberCity } from "@/components/remember-city";
 import { VisitedToggle } from "@/components/visited-toggle";
+import { SaveToggle } from "@/components/save-toggle";
+import { ShareShopButton } from "@/components/share-shop-button";
 import { citySlug } from "@/lib/city";
 import { safeJsonLd } from "@/lib/json-ld";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100";
 
 export async function generateMetadata({
   params,
@@ -72,13 +76,22 @@ export default async function ShopDetailPage({
   const otherReviews = allReviews.filter((r) => r.id !== myReview?.id);
 
   let alreadyVisited = false;
+  let alreadySaved = false;
   if (currentUserId) {
-    const { data: visitedRow } = await supabase
-      .from("visited_shops")
-      .select("shop_id")
-      .eq("shop_id", shop.id)
-      .maybeSingle();
+    const [{ data: visitedRow }, { data: savedRow }] = await Promise.all([
+      supabase
+        .from("visited_shops")
+        .select("shop_id")
+        .eq("shop_id", shop.id)
+        .maybeSingle(),
+      supabase
+        .from("saved_shops")
+        .select("shop_id")
+        .eq("shop_id", shop.id)
+        .maybeSingle(),
+    ]);
     alreadyVisited = visitedRow != null;
+    alreadySaved = savedRow != null;
   }
   const liveRating =
     allReviews.length > 0
@@ -148,11 +161,23 @@ export default async function ShopDetailPage({
         </p>
       </div>
 
-      <VisitedToggle
-        shopId={shop.id}
-        initiallyVisited={alreadyVisited}
-        signedIn={currentUserId != null}
-      />
+      <div className="flex flex-wrap items-center gap-3">
+        <VisitedToggle
+          shopId={shop.id}
+          initiallyVisited={alreadyVisited}
+          signedIn={currentUserId != null}
+        />
+        <SaveToggle
+          shopId={shop.id}
+          initiallySaved={alreadySaved}
+          signedIn={currentUserId != null}
+        />
+        <ShareShopButton
+          url={`${siteUrl}/shops/${citySlug(shop.city)}/${shop.dex_number}`}
+          title={`${shop.name} · Coffeedex`}
+          text={`What do you think about going to ${shop.name}?`}
+        />
+      </div>
 
       {liveRating != null ? (
         <div className="flex items-center gap-1.5">

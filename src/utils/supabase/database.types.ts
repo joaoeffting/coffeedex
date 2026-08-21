@@ -62,6 +62,35 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_shops: {
+        Row: {
+          id: string
+          saved_at: string
+          shop_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          saved_at?: string
+          shop_id: string
+          user_id?: string
+        }
+        Update: {
+          id?: string
+          saved_at?: string
+          shop_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_shops_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "coffee_shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_reviews: {
         Row: {
           comment: string | null
