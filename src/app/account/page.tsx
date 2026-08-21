@@ -99,11 +99,18 @@ export default async function AccountPage() {
         </div>
       )}
 
-      <form action={logout}>
-        <Button type="submit" variant="outline" className="w-full">
-          Log out
-        </Button>
-      </form>
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          className="w-full"
+          render={<Link href="/change-city">Change City</Link>}
+        />
+        <form action={logout}>
+          <Button type="submit" variant="outline" className="w-full">
+            Log out
+          </Button>
+        </form>
+      </div>
     </main>
   );
 }

@@ -9,6 +9,7 @@ import { CookiePreferencesLink } from "@/components/cookie-preferences-link";
 import { PostHogPageview } from "@/components/posthog-pageview";
 import { NavAuthLinks } from "@/components/nav-auth-links";
 import { IosInstallPrompt } from "@/components/ios-install-prompt";
+import { BottomNav } from "@/components/bottom-nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,7 +69,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/" className="font-heading text-lg font-semibold">
                 ☕ Coffeedex
               </Link>
-              <nav className="flex items-center gap-4">
+              {/* Hidden below md — BottomNav takes over there instead of
+                  wrapping onto a second line at phone widths. */}
+              <nav className="hidden items-center gap-4 md:flex">
                 <Link
                   href="/dex"
                   className="text-sm text-muted-foreground hover:text-foreground"
@@ -81,20 +84,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 >
                   Saved
                 </Link>
-                <Link
-                  href="/change-city"
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
-                  Change City
-                </Link>
                 <Suspense fallback={null}>
                   <NavAuthLinks />
                 </Suspense>
               </nav>
             </div>
           </header>
-          <div className="flex-1">{children}</div>
-          <footer className="border-t-2 border-border bg-secondary/40 px-4 py-6 text-center text-xs text-muted-foreground">
+          {/* pb-20 clears BottomNavBar's fixed height on mobile; not
+              needed on desktop, where it's hidden. */}
+          <div className="flex-1 pb-20 md:pb-0">{children}</div>
+          <footer className="mb-20 border-t-2 border-border bg-secondary/40 px-4 py-6 text-center text-xs text-muted-foreground md:mb-0">
             <p>
               Coffeedex — a coffee shop collection.{" "}
               <Link href="/privacy" className="underline underline-offset-4">
@@ -105,6 +104,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </footer>
           <AnalyticsConsentBanner />
           <IosInstallPrompt />
+          <Suspense fallback={null}>
+            <BottomNav />
+          </Suspense>
         </Providers>
       </body>
     </html>

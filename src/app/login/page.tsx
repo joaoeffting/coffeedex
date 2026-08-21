@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,6 +92,12 @@ export default async function LoginPage({
           </form>
         </TabsContent>
       </Tabs>
+
+      <p className="text-center text-sm text-muted-foreground">
+        <Link href="/change-city" className="underline underline-offset-4">
+          Change City
+        </Link>
+      </p>
     </main>
   );
 }

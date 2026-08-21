@@ -37,7 +37,9 @@ export function IosInstallPrompt() {
   if (!isInstallable || dismissed || !consentDecided) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t-2 border-border bg-card p-4 shadow-lg">
+    // bottom-20 clears BottomNavBar on mobile (md:hidden there, so back
+    // to bottom-0 at desktop widths where it doesn't exist).
+    <div className="fixed inset-x-0 bottom-20 z-50 border-t-2 border-border bg-card p-4 shadow-lg md:bottom-0">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
           Install Coffeedex: tap the share icon{" "}
