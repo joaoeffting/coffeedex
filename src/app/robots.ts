@@ -9,7 +9,13 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       // Auth/account flows and utility redirects have nothing worth
       // indexing and shouldn't show up as search results.
-      disallow: ["/account", "/login", "/check-email", "/change-city"],
+      disallow: [
+        "/account",
+        "/login",
+        "/check-email",
+        "/change-city",
+        "/admin",
+      ],
     },
     sitemap: `${siteUrl}/sitemap.xml`,
   };
