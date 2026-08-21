@@ -111,7 +111,7 @@ export function DexGrid({
               key={shop.id}
               className={
                 isVisited
-                  ? "dex-outline flex flex-col gap-2 rounded-2xl bg-card p-3"
+                  ? "dex-outline dex-outline-visited flex flex-col gap-2 rounded-2xl bg-card p-3"
                   : "flex flex-col gap-2 rounded-2xl border-2 border-dashed border-border/50 bg-muted/50 p-3"
               }
             >

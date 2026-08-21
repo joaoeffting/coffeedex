@@ -26,21 +26,39 @@ export default async function DiscoverPage({
   const { city } = await params;
   const supabase = await createClient();
 
-  const { data: shops } = await supabase
-    .from("coffee_shops")
-    .select("id, dex_number, name, neighborhood, lat, lng, city, rating")
-    .ilike("city", city)
-    .order("dex_number");
+  const [{ data: shops }, { data: claims }] = await Promise.all([
+    supabase
+      .from("coffee_shops")
+      .select("id, dex_number, name, neighborhood, lat, lng, city, rating")
+      .ilike("city", city)
+      .order("dex_number"),
+    supabase.auth.getClaims(),
+  ]);
 
   if (!shops || shops.length === 0) notFound();
 
-  const { data: reviews } = await supabase
-    .from("shop_reviews")
-    .select("shop_id, rating")
-    .in(
-      "shop_id",
-      shops.map((s) => s.id),
-    );
+  const signedIn = claims?.claims != null;
+
+  const [{ data: reviews }, { data: visited }] = await Promise.all([
+    supabase
+      .from("shop_reviews")
+      .select("shop_id, rating")
+      .in(
+        "shop_id",
+        shops.map((s) => s.id),
+      ),
+    signedIn
+      ? supabase
+          .from("visited_shops")
+          .select("shop_id")
+          .in(
+            "shop_id",
+            shops.map((s) => s.id),
+          )
+      : Promise.resolve({ data: [] as { shop_id: string }[] }),
+  ]);
+
+  const visitedIds = (visited ?? []).map((v) => v.shop_id);
 
   const reviewRatingsByShop = new Map<string, number[]>();
   for (const review of reviews ?? []) {
@@ -78,7 +96,13 @@ export default async function DiscoverPage({
         <DexMapToggle citySlug={city} active="map" />
       </div>
       <div className="min-h-0 flex-1">
-        <CityMapLoader shops={mapShops} citySlug={city} center={center} />
+        <CityMapLoader
+          shops={mapShops}
+          citySlug={city}
+          center={center}
+          signedIn={signedIn}
+          initiallyVisited={visitedIds}
+        />
       </div>
     </main>
   );

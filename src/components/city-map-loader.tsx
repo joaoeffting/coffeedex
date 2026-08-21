@@ -25,12 +25,16 @@ export function CityMapLoader({
   center,
   zoom,
   linkToDetail,
+  signedIn,
+  initiallyVisited,
 }: {
   shops: MapShop[];
   citySlug: string;
   center?: [number, number];
   zoom?: number;
   linkToDetail?: boolean;
+  signedIn?: boolean;
+  initiallyVisited?: string[];
 }) {
   return (
     <CityMap
@@ -39,6 +43,8 @@ export function CityMapLoader({
       center={center}
       zoom={zoom}
       linkToDetail={linkToDetail}
+      signedIn={signedIn}
+      initiallyVisited={initiallyVisited}
     />
   );
 }

@@ -19,7 +19,7 @@ export async function markVisited(
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/dex/[city]", "page");
+  revalidateVisitedSurfaces();
   return { ok: true };
 }
 
@@ -39,6 +39,16 @@ export async function unmarkVisited(
 
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/dex/[city]", "page");
+  revalidateVisitedSurfaces();
   return { ok: true };
+}
+
+// "Visited" state now shows up in three separate places (the dex grid, a
+// shop's own detail page, the discover map's popups) since it can also be
+// toggled from any of them — one flip needs to invalidate all three, not
+// just the surface the user happened to toggle it from.
+function revalidateVisitedSurfaces() {
+  revalidatePath("/dex/[city]", "page");
+  revalidatePath("/shops/[city]/[dexNumber]", "page");
+  revalidatePath("/discover/[city]", "page");
 }

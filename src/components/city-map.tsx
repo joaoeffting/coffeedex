@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import {
   MapContainer,
@@ -13,6 +13,8 @@ import {
 import { divIcon } from "leaflet";
 import { Star, LocateFixed } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import { HoldToConfirmButton } from "@/components/hold-to-confirm-button";
+import { markVisited, unmarkVisited } from "@/app/dex/actions";
 
 // Just a sane fallback if a caller omits `center` — every real caller
 // currently passes an explicit one (a shop's own coordinates, or a
@@ -50,17 +52,34 @@ function escapeHtml(value: string): string {
 // (Turbopack included) unless separately patched. A divIcon sidesteps
 // that entirely and reads as more on-brand than a generic pin anyway.
 //
+// The app's own primary green (--primary in globals.css, same value used
+// by .dex-outline-visited on the dex grid cards) — read via CSS var with
+// the same literal as fallback so a divIcon's raw HTML string (rendered
+// outside Tailwind's cascade) still matches if the var is ever missing.
+const VISITED_PIN_COLOR = "var(--primary, #c7dd5a)";
+
 // The name label is absolutely positioned below the emoji rather than
 // sized into the icon's own box — Leaflet's iconSize/iconAnchor drive
 // where the *pin* lands on the coordinate, and a variable-width label
 // would throw that off if it were part of the sized box instead of
 // floating free underneath it.
-function buildShopIcon(name: string) {
+//
+// A visited shop gets a green ring around the emoji, and the same green
+// on the label's border — sized to the same 26x26 box via box-sizing so
+// the ring doesn't shift iconAnchor's pin-tip math — giving an at-a-glance
+// "already been here" without opening the popup.
+function buildShopIcon(name: string, visited: boolean) {
+  const emojiHtml = visited
+    ? `<span style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; box-sizing: border-box; border: 2.5px solid ${VISITED_PIN_COLOR}; border-radius: 50%; background: var(--card, #fffbf2); font-size: 17px; line-height: 1;">☕</span>`
+    : `<span style="font-size: 26px; line-height: 1;">☕</span>`;
+  const labelBorderColor = visited
+    ? VISITED_PIN_COLOR
+    : "var(--border, #2b1d12)";
   return divIcon({
     html: `
       <div style="position: relative;">
-        <span style="font-size: 26px; line-height: 1;">☕</span>
-        <span style="position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--card, #fffbf2); border: 2px solid var(--border, #2b1d12); border-radius: 999px; padding: 1px 7px; font-size: 11px; font-weight: 600; font-family: var(--font-heading), sans-serif; color: var(--foreground, #2b1d12); box-shadow: 2px 2px 0 0 var(--border, #2b1d12);">${escapeHtml(name)}</span>
+        ${emojiHtml}
+        <span style="position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--card, #fffbf2); border: 2px solid ${labelBorderColor}; border-radius: 999px; padding: 1px 7px; font-size: 11px; font-weight: 600; font-family: var(--font-heading), sans-serif; color: var(--foreground, #2b1d12); box-shadow: 2px 2px 0 0 var(--border, #2b1d12);">${escapeHtml(name)}</span>
       </div>
     `,
     className: "",
@@ -110,12 +129,21 @@ export function CityMap({
   // pointless (and Leaflet's popupAnchor math makes it easy to miss that
   // case if it isn't opt-out-able).
   linkToDetail = true,
+  // undefined (the default) hides the visited control entirely — the
+  // shop detail page's own pinpoint map already has a visited toggle on
+  // the page itself, so a second one in the popup would be redundant.
+  // The discover map (many pins, no per-shop toggle elsewhere) passes
+  // both of these to opt in.
+  signedIn,
+  initiallyVisited,
 }: {
   shops: MapShop[];
   citySlug: string;
   center?: [number, number];
   zoom?: number;
   linkToDetail?: boolean;
+  signedIn?: boolean;
+  initiallyVisited?: string[];
 }) {
   const [userPosition, setUserPosition] = useState<{
     lat: number;
@@ -125,6 +153,33 @@ export function CityMap({
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
   const watchIdRef = useRef<number | null>(null);
+  const [visited, setVisited] = useState(() => new Set(initiallyVisited));
+  const [isPending, startTransition] = useTransition();
+
+  // Optimistic, same pattern as DexGrid — flips immediately, reverts only
+  // if the server action reports failure.
+  function toggleVisited(shopId: string) {
+    const wasVisited = visited.has(shopId);
+    setVisited((prev) => {
+      const next = new Set(prev);
+      if (wasVisited) next.delete(shopId);
+      else next.add(shopId);
+      return next;
+    });
+    startTransition(async () => {
+      const result = wasVisited
+        ? await unmarkVisited(shopId)
+        : await markVisited(shopId);
+      if (!result.ok) {
+        setVisited((prev) => {
+          const next = new Set(prev);
+          if (wasVisited) next.add(shopId);
+          else next.delete(shopId);
+          return next;
+        });
+      }
+    });
+  }
 
   // Stop watching on unmount (navigating away, or the [city] route
   // changing underneath this component) — a dangling watch would keep
@@ -137,14 +192,8 @@ export function CityMap({
     };
   }, []);
 
-  function toggleLocate() {
-    if (watchIdRef.current != null) {
-      navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-      setLocating(false);
-      setUserPosition(null);
-      return;
-    }
+  function startLocating() {
+    if (watchIdRef.current != null) return;
 
     if (!("geolocation" in navigator)) {
       setGeoError("Geolocation isn't supported on this device.");
@@ -177,6 +226,44 @@ export function CityMap({
     );
   }
 
+  function stopLocating() {
+    if (watchIdRef.current != null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    setLocating(false);
+    setUserPosition(null);
+  }
+
+  // Auto-show the user's dot on load, but only if permission was already
+  // granted on a previous visit — checked via the Permissions API so this
+  // never itself triggers the browser's permission prompt. Calling
+  // watchPosition blind on mount would prompt on every page load for
+  // anyone who hasn't granted yet, not just the already-granted case this
+  // is meant for. Browsers without Permissions API support for
+  // "geolocation" (older Safari) just keep the manual button.
+  useEffect(() => {
+    if (!("permissions" in navigator)) return;
+    let cancelled = false;
+    navigator.permissions
+      .query({ name: "geolocation" })
+      .then((status) => {
+        if (!cancelled && status.state === "granted") startLocating();
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function toggleLocate() {
+    if (watchIdRef.current != null) {
+      stopLocating();
+    } else {
+      startLocating();
+    }
+  }
+
   return (
     <div className="relative size-full">
       <MapContainer
@@ -193,7 +280,7 @@ export function CityMap({
           <Marker
             key={shop.id}
             position={[shop.lat, shop.lng]}
-            icon={buildShopIcon(shop.name)}
+            icon={buildShopIcon(shop.name, visited.has(shop.id))}
           >
             <Popup>
               <p className="font-heading font-semibold">
@@ -215,6 +302,39 @@ export function CityMap({
                     </span>
                   )}
                 </p>
+              )}
+              {signedIn != null && (
+                <div className="mt-1.5">
+                  {visited.has(shop.id) ? (
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full border-2 border-border bg-primary px-2 py-0.5 text-[0.65rem] font-bold tracking-wide text-primary-foreground uppercase">
+                        Visited
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => toggleVisited(shop.id)}
+                        disabled={isPending}
+                        className="text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
+                      >
+                        Unmark
+                      </button>
+                    </div>
+                  ) : signedIn ? (
+                    <HoldToConfirmButton
+                      onConfirm={() => toggleVisited(shop.id)}
+                      idleLabel="Hold to mark visited"
+                      holdingLabel="Keep holding…"
+                      className="rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground"
+                    />
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="text-xs text-primary underline"
+                    >
+                      Log in to track visits
+                    </Link>
+                  )}
+                </div>
               )}
               {linkToDetail && (
                 <Link

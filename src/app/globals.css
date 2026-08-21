@@ -120,3 +120,11 @@
   border-color: var(--border);
   box-shadow: 4px 4px 0 0 var(--border);
 }
+
+/* App's own primary green for a visited shop's border — layered after
+   .dex-outline so it wins on the border-color property alone; the shadow
+   stays the normal black outline color, so this reads as "same card,
+   green ring" rather than a different card style. */
+.dex-outline-visited {
+  border-color: var(--primary);
+}

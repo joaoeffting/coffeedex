@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ReviewForm } from "@/components/review-form";
 import { ReviewList } from "@/components/review-list";
 import { RememberCity } from "@/components/remember-city";
+import { VisitedToggle } from "@/components/visited-toggle";
 import { citySlug } from "@/lib/city";
 import { safeJsonLd } from "@/lib/json-ld";
 
@@ -69,6 +70,16 @@ export default async function ShopDetailPage({
   const currentUserId = (claims?.claims.sub as string | undefined) ?? null;
   const myReview = allReviews.find((r) => r.user_id === currentUserId) ?? null;
   const otherReviews = allReviews.filter((r) => r.id !== myReview?.id);
+
+  let alreadyVisited = false;
+  if (currentUserId) {
+    const { data: visitedRow } = await supabase
+      .from("visited_shops")
+      .select("shop_id")
+      .eq("shop_id", shop.id)
+      .maybeSingle();
+    alreadyVisited = visitedRow != null;
+  }
   const liveRating =
     allReviews.length > 0
       ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
@@ -137,6 +148,12 @@ export default async function ShopDetailPage({
         </p>
       </div>
 
+      <VisitedToggle
+        shopId={shop.id}
+        initiallyVisited={alreadyVisited}
+        signedIn={currentUserId != null}
+      />
+
       {liveRating != null ? (
         <div className="flex items-center gap-1.5">
           <Star
@@ -186,6 +203,7 @@ export default async function ShopDetailPage({
           center={[shop.lat, shop.lng]}
           zoom={15}
           linkToDetail={false}
+          initiallyVisited={alreadyVisited ? [shop.id] : []}
         />
       </div>
 
