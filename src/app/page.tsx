@@ -1,65 +1,10 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { useSyncExternalStore } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { cityDisplayName } from "@/lib/city";
-import { getStoredCitySlug } from "@/lib/city-preference";
-
-// No real subscription needed — this is just the React-approved way to
-// read localStorage without a server/client mismatch on first paint (see
-// ChangeCityPicker for the same pattern).
-function subscribe() {
-  return () => {};
-}
-
+// No standalone landing page, and no auth branch either — /discover
+// already works read-only for signed-out visitors (browse the map, with
+// "Log in to track visits" prompts built into the pins themselves), so
+// it doubles as the pitch. Login only comes up once someone actually
+// tries to mark a shop visited.
 export default function Home() {
-  const citySlug = useSyncExternalStore(
-    subscribe,
-    getStoredCitySlug,
-    () => null,
-  );
-  const city = cityDisplayName(citySlug ?? "stockholm");
-
-  return (
-    <main className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md flex-col items-center justify-center gap-8 px-6 py-12 text-center">
-      <Card className="dex-outline w-full items-center bg-accent px-6 py-10 text-accent-foreground">
-        <CardContent className="flex w-full flex-col items-center gap-4 px-0">
-          {/* Stand-in for a real shop-collection illustration — swapped
-              in once Phase 3 seeds real shop photos. */}
-          <div className="dex-outline flex size-40 items-center justify-center rounded-2xl bg-card text-6xl">
-            ☕
-          </div>
-          <p className="font-heading text-sm font-medium uppercase tracking-wide">
-            {city} · #001
-          </p>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-2">
-        <h1 className="font-heading text-3xl font-semibold text-balance">
-          Collect {city}&apos;s coffee shops
-        </h1>
-        <p className="text-muted-foreground text-balance">
-          Visit a real cafe, mark it visited, and watch your personal album
-          fill in — Pokédex-style.
-        </p>
-      </div>
-
-      <div className="flex w-full flex-col gap-3">
-        <Button
-          size="lg"
-          className="dex-outline w-full"
-          render={<Link href="/dex">Get started!</Link>}
-        />
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full"
-          render={<Link href="/discover">Preview the map</Link>}
-        />
-      </div>
-    </main>
-  );
+  redirect("/discover");
 }

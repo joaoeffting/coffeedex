@@ -12,8 +12,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const cities = [...new Set((shops ?? []).map((s) => s.city))];
 
+  // "/" isn't listed here — it's a straight redirect to either /discover
+  // (signed in) or /login (noindex), never content of its own, so it'd
+  // just point crawlers at a dead end.
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: siteUrl, changeFrequency: "monthly" },
     { url: `${siteUrl}/privacy`, changeFrequency: "yearly" },
   ];
 
