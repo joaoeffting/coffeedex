@@ -28,9 +28,10 @@ export type MapShop = {
   neighborhood: string;
   lat: number;
   lng: number;
-  // Live coffeedex average when reviews exist, falling back to the
-  // curated snapshot rating otherwise — same resolution the shop detail
-  // page uses, so the popup and the detail page never disagree.
+  // Live coffeedex average only, null until the shop has a real in-app
+  // review — same resolution the shop detail page uses (see
+  // resolveShopRating), so the pin, popup, and detail page never
+  // disagree and never show an external rating as if it were one.
   rating: number | null;
   reviewCount: number;
 };
@@ -58,6 +59,13 @@ function escapeHtml(value: string): string {
 // outside Tailwind's cascade) still matches if the var is ever missing.
 const VISITED_PIN_COLOR = "var(--primary, #c7dd5a)";
 
+// The exact path lucide-react's <Star> icon renders — inlined because
+// the label pill is raw divIcon HTML, outside React, so the actual
+// component can't be used here. Kept pixel-identical to the Star shown
+// in the popup and on the shop detail page.
+const STAR_PATH =
+  "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z";
+
 // The name label is absolutely positioned below the emoji rather than
 // sized into the icon's own box — Leaflet's iconSize/iconAnchor drive
 // where the *pin* lands on the coordinate, and a variable-width label
@@ -67,19 +75,29 @@ const VISITED_PIN_COLOR = "var(--primary, #c7dd5a)";
 // A visited shop gets a green ring around the emoji, and the same green
 // on the label's border — sized to the same 26x26 box via box-sizing so
 // the ring doesn't shift iconAnchor's pin-tip math — giving an at-a-glance
-// "already been here" without opening the popup.
-function buildShopIcon(name: string, visited: boolean) {
+// "already been here" without opening the popup. A rated shop gets its
+// star rating in the same label, ahead of the name, so it's visible
+// without a tap too — hidden entirely when there's no rating yet rather
+// than showing a placeholder.
+function buildShopIcon(name: string, visited: boolean, rating: number | null) {
   const emojiHtml = visited
     ? `<span style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; box-sizing: border-box; border: 2.5px solid ${VISITED_PIN_COLOR}; border-radius: 50%; background: var(--card, #fffbf2); font-size: 17px; line-height: 1;">☕</span>`
     : `<span style="font-size: 26px; line-height: 1;">☕</span>`;
   const labelBorderColor = visited
     ? VISITED_PIN_COLOR
     : "var(--border, #2b1d12)";
+  const ratingHtml =
+    rating != null
+      ? `<span style="display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="var(--primary, #c7dd5a)" stroke="var(--primary, #c7dd5a)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${STAR_PATH}"></path></svg>
+          <span>${rating.toFixed(1)}</span>
+        </span>`
+      : "";
   return divIcon({
     html: `
       <div style="position: relative;">
         ${emojiHtml}
-        <span style="position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--card, #fffbf2); border: 2px solid ${labelBorderColor}; border-radius: 999px; padding: 1px 7px; font-size: 11px; font-weight: 600; font-family: var(--font-heading), sans-serif; color: var(--foreground, #2b1d12); box-shadow: 2px 2px 0 0 var(--border, #2b1d12);">${escapeHtml(name)}</span>
+        <span style="position: absolute; top: 26px; left: 50%; transform: translateX(-50%); white-space: nowrap; background: var(--card, #fffbf2); border: 2px solid ${labelBorderColor}; border-radius: 999px; padding: 1px 7px; font-size: 11px; font-weight: 600; font-family: var(--font-heading), sans-serif; color: var(--foreground, #2b1d12); box-shadow: 2px 2px 0 0 var(--border, #2b1d12); display: inline-flex; align-items: center; gap: 4px;">${ratingHtml}${escapeHtml(name)}</span>
       </div>
     `,
     className: "",
@@ -269,18 +287,25 @@ export function CityMap({
       <MapContainer
         center={center}
         zoom={zoom}
+        // Leaflet's default max is 18 — too coarse once a few shops sit
+        // within a few meters of each other (e.g. three cafés on the
+        // same Gamla Stan square), leaving pins stacked with no way to
+        // zoom in past that to separate them. 19 is the standard OSM
+        // tile server's own max, so tiles stay sharp at the new ceiling.
+        maxZoom={19}
         scrollWheelZoom
         className="dex-outline size-full rounded-2xl"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
         {shops.map((shop) => (
           <Marker
             key={shop.id}
             position={[shop.lat, shop.lng]}
-            icon={buildShopIcon(shop.name, visited.has(shop.id))}
+            icon={buildShopIcon(shop.name, visited.has(shop.id), shop.rating)}
           >
             <Popup>
               <p className="font-heading font-semibold">

@@ -179,7 +179,7 @@ export default async function ShopDetailPage({
         />
       </div>
 
-      {liveRating != null ? (
+      {liveRating != null && (
         <div className="flex items-center gap-1.5">
           <Star
             className="h-5 w-5 fill-primary text-primary"
@@ -191,20 +191,6 @@ export default async function ShopDetailPage({
             {allReviews.length === 1 ? "" : "s"}
           </span>
         </div>
-      ) : (
-        shop.rating != null && (
-          <div className="flex items-center gap-1.5">
-            <Star
-              className="h-5 w-5 fill-primary text-primary"
-              aria-hidden="true"
-            />
-            <span className="font-medium">{shop.rating.toFixed(1)}</span>
-            <span className="text-sm text-muted-foreground">
-              — aggregate rating at time of curation, not live. Be the first
-              to leave a coffeedex review below.
-            </span>
-          </div>
-        )
       )}
 
       {shop.tags.length > 0 && (
@@ -221,9 +207,7 @@ export default async function ShopDetailPage({
 
       <div className="h-64">
         <CityMapLoader
-          shops={[
-            { ...shop, rating: liveRating ?? shop.rating, reviewCount: allReviews.length },
-          ]}
+          shops={[{ ...shop, rating: liveRating, reviewCount: allReviews.length }]}
           citySlug={citySlug(shop.city)}
           center={[shop.lat, shop.lng]}
           zoom={15}

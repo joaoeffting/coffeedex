@@ -29,7 +29,7 @@ export default async function DiscoverPage({
   const [{ data: shops }, { data: claims }] = await Promise.all([
     supabase
       .from("coffee_shops")
-      .select("id, dex_number, name, neighborhood, lat, lng, city, rating")
+      .select("id, dex_number, name, neighborhood, lat, lng, city")
       .ilike("city", city)
       .order("dex_number"),
     supabase.auth.getClaims(),
@@ -78,7 +78,7 @@ export default async function DiscoverPage({
 
   const mapShops = shops.map((shop) => ({
     ...shop,
-    ...resolveShopRating(shop.rating, reviewRatingsByShop.get(shop.id) ?? []),
+    ...resolveShopRating(reviewRatingsByShop.get(shop.id) ?? []),
   }));
 
   return (
