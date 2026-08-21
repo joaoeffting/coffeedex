@@ -307,68 +307,80 @@ export function CityMap({
             position={[shop.lat, shop.lng]}
             icon={buildShopIcon(shop.name, visited.has(shop.id), shop.rating)}
           >
+            {/* select-none on the whole popup, not just the hold button
+                inside it — a long-press landing on a select-none target
+                falls back to selecting the nearest selectable text on
+                mobile, and this popup's shop name/rating sit right next
+                to the button. Same fix as the dex grid and detail page. */}
             <Popup>
-              <p className="font-heading font-semibold">
-                #{shop.dex_number} {shop.name}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {shop.neighborhood}
-              </p>
-              {shop.rating != null && (
-                <p className="flex items-center gap-1 text-sm">
-                  <Star
-                    className="h-3.5 w-3.5 fill-primary text-primary"
-                    aria-hidden="true"
-                  />
-                  <span className="font-medium">{shop.rating.toFixed(1)}</span>
-                  {shop.reviewCount > 0 && (
-                    <span className="text-muted-foreground">
-                      ({shop.reviewCount})
-                    </span>
-                  )}
+              <div
+                style={{ WebkitTouchCallout: "none" }}
+                className="select-none"
+              >
+                <p className="font-heading font-semibold">
+                  #{shop.dex_number} {shop.name}
                 </p>
-              )}
-              {signedIn != null && (
-                <div className="mt-1.5">
-                  {visited.has(shop.id) ? (
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full border-2 border-border bg-primary px-2 py-0.5 text-[0.65rem] font-bold tracking-wide text-primary-foreground uppercase">
-                        Visited
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => toggleVisited(shop.id)}
-                        disabled={isPending}
-                        className="text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
-                      >
-                        Unmark
-                      </button>
-                    </div>
-                  ) : signedIn ? (
-                    <HoldToConfirmButton
-                      onConfirm={() => toggleVisited(shop.id)}
-                      idleLabel="Hold to mark visited"
-                      holdingLabel="Keep holding…"
-                      className="rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground"
+                <p className="text-sm text-muted-foreground">
+                  {shop.neighborhood}
+                </p>
+                {shop.rating != null && (
+                  <p className="flex items-center gap-1 text-sm">
+                    <Star
+                      className="h-3.5 w-3.5 fill-primary text-primary"
+                      aria-hidden="true"
                     />
-                  ) : (
-                    <Link
-                      href="/login"
-                      className="text-xs text-primary underline"
-                    >
-                      Log in to track visits
-                    </Link>
-                  )}
-                </div>
-              )}
-              {linkToDetail && (
-                <Link
-                  href={`/shops/${citySlug}/${shop.dex_number}`}
-                  className="text-sm underline underline-offset-4"
-                >
-                  View details →
-                </Link>
-              )}
+                    <span className="font-medium">
+                      {shop.rating.toFixed(1)}
+                    </span>
+                    {shop.reviewCount > 0 && (
+                      <span className="text-muted-foreground">
+                        ({shop.reviewCount})
+                      </span>
+                    )}
+                  </p>
+                )}
+                {signedIn != null && (
+                  <div className="mt-1.5">
+                    {visited.has(shop.id) ? (
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full border-2 border-border bg-primary px-2 py-0.5 text-[0.65rem] font-bold tracking-wide text-primary-foreground uppercase">
+                          Visited
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => toggleVisited(shop.id)}
+                          disabled={isPending}
+                          className="text-xs font-medium text-muted-foreground underline underline-offset-2 disabled:opacity-60"
+                        >
+                          Unmark
+                        </button>
+                      </div>
+                    ) : signedIn ? (
+                      <HoldToConfirmButton
+                        onConfirm={() => toggleVisited(shop.id)}
+                        idleLabel="Hold to mark visited"
+                        holdingLabel="Keep holding…"
+                        className="rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground"
+                      />
+                    ) : (
+                      <Link
+                        href="/login"
+                        className="text-xs text-primary underline"
+                      >
+                        Log in to track visits
+                      </Link>
+                    )}
+                  </div>
+                )}
+                {linkToDetail && (
+                  <Link
+                    href={`/shops/${citySlug}/${shop.dex_number}`}
+                    className="text-sm underline underline-offset-4"
+                  >
+                    View details →
+                  </Link>
+                )}
+              </div>
             </Popup>
           </Marker>
         ))}

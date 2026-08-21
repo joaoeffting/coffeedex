@@ -150,7 +150,12 @@ export default async function ShopDetailPage({
         ← Back to Discover
       </Link>
 
-      <div>
+      {/* select-none here (not just on the hold button below) — a
+          long-press landing on a select-none target falls back to
+          selecting the nearest selectable text on mobile, and the name/
+          address sitting right above the hold-to-confirm button is
+          exactly that nearest text. Same fix as the dex grid. */}
+      <div style={{ WebkitTouchCallout: "none" }} className="select-none">
         <p className="font-heading text-sm font-medium text-muted-foreground uppercase tracking-wide">
           #{shop.dex_number}
         </p>
@@ -161,7 +166,10 @@ export default async function ShopDetailPage({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div
+        style={{ WebkitTouchCallout: "none" }}
+        className="flex flex-wrap items-center gap-3 select-none"
+      >
         <VisitedToggle
           shopId={shop.id}
           initiallyVisited={alreadyVisited}
