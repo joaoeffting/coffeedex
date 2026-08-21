@@ -5,13 +5,18 @@ import { useRouter } from "next/navigation";
 import { getStoredCitySlug } from "@/lib/city-preference";
 
 // Same pattern as /dex and /discover — the preferred city lives in
-// localStorage (client-only), so picking a default has to happen
-// client-side after mount.
+// localStorage (client-only), so reading it has to happen client-side
+// after mount. No stored city (a genuinely first-ever visit, not just a
+// fresh session) means asking rather than silently guessing Stockholm —
+// every visitor lands here without a preference exactly once.
 export default function SavedRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(`/saved/${getStoredCitySlug() ?? "stockholm"}`);
+    const citySlug = getStoredCitySlug();
+    router.replace(
+      citySlug ? `/saved/${citySlug}` : "/change-city?from=saved",
+    );
   }, [router]);
 
   return null;
