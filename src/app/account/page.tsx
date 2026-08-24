@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
 import { citySlug } from "@/lib/city";
 import { isAdmin } from "@/lib/admin";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { logout } from "../login/actions";
 
 // Belt-and-suspenders alongside robots.ts's disallow — a noindex meta tag
@@ -99,6 +100,11 @@ export default async function AccountPage() {
           </p>
         </div>
       )}
+
+      <div className="space-y-2">
+        <h2 className="font-heading text-lg font-semibold">Appearance</h2>
+        <ThemeToggle />
+      </div>
 
       <div className="space-y-2">
         {isAdmin(data.claims) && (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fredoka } from "next/font/google";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import "./globals.css";
 import { Providers } from "@/app/providers";
@@ -10,6 +11,7 @@ import { PostHogPageview } from "@/components/posthog-pageview";
 import { NavAuthLinks } from "@/components/nav-auth-links";
 import { IosInstallPrompt } from "@/components/ios-install-prompt";
 import { BottomNav } from "@/components/bottom-nav";
+import { THEME_STORAGE_KEY } from "@/lib/theme-preference";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,13 +55,32 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const nonce = (await headers()).get("x-nonce");
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} h-full antialiased`}
+      // The blocking script below adds .dark to this element before React
+      // hydrates, on purpose (that's what avoids the flash) — React would
+      // otherwise log a hydration mismatch for the one attribute it
+      // doesn't control. Scoped to just this element/attribute, not a
+      // blanket suppression.
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        {/* Blocking, runs before first paint — the server always renders
+            light-mode markup (no way to read localStorage/matchMedia on
+            the server), so applying .dark from a useEffect instead would
+            flash light mode first on every dark-mode visit. Must be the
+            very first thing in <body> so nothing paints before it runs. */}
+        <script
+          nonce={nonce ?? undefined}
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
         <Providers>
           <Suspense fallback={null}>
             <PostHogPageview />

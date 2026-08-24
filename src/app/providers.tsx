@@ -4,6 +4,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { getStoredConsent, subscribeToConsent } from "@/lib/analytics-consent";
+import { applyTheme, getStoredTheme } from "@/lib/theme-preference";
 
 // posthog.init() is what actually starts loading PostHog's script and
 // sending data — gating it behind this (rather than initializing
@@ -45,6 +46,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     initPostHogIfConsented();
   }, [consent]);
+
+  // The blocking script in layout.tsx already sets .dark correctly for
+  // first paint — this is for while the app stays open: if the
+  // preference is "system" and the OS theme flips (e.g. sunset, or the
+  // user changes it in settings), the app should follow live rather
+  // than needing a reload. Providers mounts once per hard navigation
+  // and persists across client-side route changes, so this listener
+  // stays attached the whole session.
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    function handleChange() {
+      if (getStoredTheme() === "system") applyTheme("system");
+    }
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
+  }, []);
 
   return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
 }

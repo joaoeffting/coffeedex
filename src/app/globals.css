@@ -77,7 +77,11 @@
   --muted-foreground: #c2af95;
   --destructive: #d9503a;
   --destructive-foreground: #1c140d;
-  --border: #4a3a28;
+  /* Not the generic shadcn dark-mode default — a muted brown here would
+     flatten .dex-outline's whole signature (its border AND its hard
+     shadow both derive from this one variable). A warm cream keeps the
+     "ink outline on the card" read the light theme has, just inverted. */
+  --border: #e8dcc0;
   --input: #4a3a28;
   --ring: #c7dd5a;
   --popover: var(--background);
